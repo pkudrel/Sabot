@@ -211,7 +211,38 @@ task CopyToPublishRepo {
 
 }
 
+# Synopsis: Tools
+task Nuget  {
 
+	$nugetTmp = Join-Path $buildTmpDir "nuget";
+	$nugetTools = Join-Path $nugetTmp "tools";
+
+	EnsureDirExistsAndIsEmpty $nugetTmp
+	EnsureDirExistsAndIsEmpty $nugetTools
+	
+	foreach ($p in $projects) {
+			Write-Host "Marge; Project: $($p.Name)"
+			$marge = Join-Path (Join-Path $buildTmpDir $p.OutputPathDirSufix) $margeDir;
+			Copy-Item "$marge/*" -destination $nugetTools
+	}
+
+	
+	$specSrc = (Join-Path $scriptsPath "nuget\Sabot.nuspec")
+	$specDst = (Join-Path $nugetTmp "Sabot.nuspec")
+
+	Copy-Item $specSrc -destination $specDst
+
+    $ndir = (Join-Path $buildPath "nuget")
+	EnsureDirExistsAndIsEmpty $ndir
+
+    $spec = [xml](get-content $specDst)
+    $spec.package.metadata.version = ([string]$spec.package.metadata.version).Replace("{Version}", $buildVersion.NuGetVersion)
+    $spec.Save($specDst )
+
+    exec { &$nuget pack $specDst -OutputDirectory  $ndir  }
+}
+
+# Synopsis: Tools
 task CheckTools {
 	Write-Host "Check tools: Nuget"
 	DownloadFileIfNotExists "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" $nugetDir $nuget 
@@ -228,4 +259,4 @@ task CheckTools {
 
 
 task Pre CheckTools, Update-TeamCity, Clean, RestorePackage, Build, Marge
-task . Pre
+task . Nuget 

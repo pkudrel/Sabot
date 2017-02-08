@@ -17,7 +17,7 @@
       "Name": "Backup",
       "Path": "\\src\\Backup\\Backup.csproj",
       "ProjectName": "Backup",
-      "OutputPathDirSufix": "Backupr",
+      "OutputPathDirSufix": "Backup",
       "OutputName": "$productName-$VersionSemString",
       "FilesToCopyToDst": [ "" ],
       "BuildFileName": "",
