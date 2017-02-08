@@ -1,0 +1,41 @@
+{
+  "ProductName": "Sabot",
+  "CompanyName": "DenebLab",
+  "Copyright": "Copyright 2017 DenebLab. All rights reserved.",
+  "PsGitVersion": {
+    "Strategy": "combinateMajorAndBuildSlice3",
+    "Major": 0,
+    "Minor": 0,
+    "Patch": 0,
+    "Special": ""
+  },
+  "PublishRepoSubDir": ".PublishRepositories\\Sabot",
+  "BuildProjectDirPath": "\\src\\build",
+  "SlnFilePath": "\\src\\Sabot.sln",
+  "Projects": [
+    {
+      "Name": "Backup",
+      "Path": "\\src\\Backup\\Backup.csproj",
+      "ProjectName": "Backup",
+      "OutputPathDirSufix": "Backupr",
+      "OutputName": "$productName-$VersionSemString",
+      "FilesToCopyToDst": [ "" ],
+      "BuildFileName": "",
+      "IsMergeable": true
+    },
+    {
+      "Name": "Restore",
+      "Path": "\\src\\Restore\\Restore.csproj",
+      "ProjectName": "Restore",
+      "OutputPathDirSufix": "Restore",
+      "OutputName": "$productName-$VersionSemString",
+      "FilesToCopyToDst": [ "" ],
+      "BuildFileName": "",
+      "IsMergeable": true
+    }
+  ],
+  "PublishZipPathDirAbsolute": "C:\\Work\\AntyPiracy\\site-analyzer\\build-output\\ready\\zip",
+  "SrcDir": "\\src",
+  "PackagesDir": "\\src\\packages"
+
+}
