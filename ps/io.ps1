@@ -16,13 +16,25 @@ function EnsureDirExistsAndIsEmpty ($path){
     }
 }
 
-function DownloadFileIfNotExists($src , $dst){
-
-    If (-not (Test-Path $dst)){
-        $dir = [System.IO.Path]::GetDirectoryName($dst)
-        If (-not (Test-Path $dir)){
-            New-Item -ItemType directory -Path $dir
+function DownloadFileIfNotExists($src , $dstDirectory, $checkFile){
+    $msg = "File src: '$src'; Dst dir: '$dstDirectory'; Check file: '$checkFile'"
+    If (-not (Test-Path $checkFile)){
+        Write-Host "$msg ; Check file not exists - processing"
+        If (-not (Test-Path $dstDirectory)){
+            New-Item -ItemType directory -Path $dstDirectory
         }
-        Invoke-WebRequest $src -OutFile $dst
+        Invoke-WebRequest $src -OutFile $checkFile
+    } else {
+        Write-Host "$msg ; Check file exists - exiting"
     }
+}
+
+function DownloadNugetIfNotExists ($nuget, $packageName, $dstDirectory, $checkFile) {
+	$msg = "Package name: '$packageName'; Dst dir: '$dstDirectory'; Check file: '$checkFile'"
+	If (-not (Test-Path  $checkFile)){
+		Write-Host "$msg ; Check file not exists - processing"
+		& $nuget install $packageName -excludeversion -outputdirectory $dstDirectory
+	} else {
+		Write-Host "$msg ; Check file exists - exiting"
+	}
 }
