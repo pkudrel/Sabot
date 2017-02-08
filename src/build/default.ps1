@@ -256,7 +256,5 @@ task CheckTools {
 
 # Synopsis: Build and clean.
 
-
-
 task Pre CheckTools, Update-TeamCity, Clean, RestorePackage, Build, Marge
 task . Nuget 
