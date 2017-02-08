@@ -24,7 +24,10 @@ param(
 		$readyDir =  (Join-Path $buildPath "ready"),
 		$srcDir = (Join-Path  $repoPath $conf.SrcDir),
 		$packagesDir = (Join-Path  $repoPath $conf.PackagesDir),
-		$nuget = (Join-Path $scriptsPath "tools\nuget\nuget.exe"),
+		$toolsDir = (Join-Path $scriptsPath "tools"),
+		$nuget = (Join-Path $toolsDir "nuget\nuget.exe"),
+		$libz = (Join-Path $toolsDir "LibZ.Tool\tools\libz.exe"),
+
 		$gitversion = (Join-Path $repoPath $conf.Gitversion),
 		$gitBranch,
 		$gitCommitNumber,
@@ -82,7 +85,7 @@ task Build {
 	Write-Host "*** Build *** $projects"
 
 	$out = $buildTmpDir
-	$srcWorkDir = Join-Path $srcDir "HostingAnalyzer"
+	$srcWorkDir = $srcDir 
 	$currentAssemblyInfo = "AssemblyInfo.cs"
 	$oldAssemblyInfo = "AssemblyInfo.cs.old"
 
@@ -170,13 +173,22 @@ task CopyToPublishRepo {
 
 }
 
-
+function DownloadNugetIfNotExists ($nuget, $packageName, $dstDirectory, $checkFile) {
+	$msg = "Package name: '$packageName'; Dst dir: '$dstDirectory'; Check file: '$checkFile'"
+	If (-not (Test-Path  $checkFile)){
+		Write-Host "$msg ; Check file not exists - processing"
+		& $nuget install $packageName -excludeversion -outputdirectory $dstDirectory
+	} else {
+		Write-Host "$msg ; Check file exists - exiting"
+	}
+}
 
 
 task CheckTools {
-	Write-Host "Check: Nuget"
+	Write-Host "Check tools: Nuget"
 	DownloadIfNotExists "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" $nuget 
-
+	Write-Host "Check tools: LibZ"
+	DownloadNugetIfNotExists $nuget "LibZ.Tool" $toolsDir $libz 
 }
 
 function DownloadIfNotExists($src , $dst){
