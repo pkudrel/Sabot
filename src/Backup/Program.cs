@@ -16,7 +16,7 @@ namespace Backup
             {
                 Console.WriteLine("Missing arguments:");
                 Console.WriteLine(
-                    "generatescript \"server=.;database=test_db;user=sa;password=password\" \"c:\\temp\\script.sql\"");
+                    "backup.exe \"server=.;database=test_db;user=sa;password=password\" \"c:\\temp\\script.sql\"");
                 Environment.Exit(1);
             }
             Console.WriteLine("Connecting to database");
@@ -24,20 +24,25 @@ namespace Backup
             var svr = new Server(serverConnection);
             var database = svr.Databases[svr.ConnectionContext.DatabaseName];
             Console.WriteLine("Setting script options");
-            var scripter1 = new Scripter(svr);
-            scripter1.Options.ScriptSchema = true;
-            scripter1.Options.ScriptData = true;
-            scripter1.Options.TargetServerVersion = SqlServerVersion.Version110;
-            scripter1.Options.Default = true;
-            scripter1.Options.Indexes = true;
-            scripter1.Options.ClusteredIndexes = true;
-            scripter1.Options.FullTextIndexes = true;
-            scripter1.Options.NonClusteredIndexes = true;
-            scripter1.Options.DriAll = true;
-            scripter1.Options.IncludeDatabaseContext = false;
-            scripter1.Options.NoFileGroup = true;
-            scripter1.Options.NoTablePartitioningSchemes = true;
-            scripter1.Options.NoIndexPartitioningSchemes = true;
+            var scripter1 = new Scripter(svr)
+            {
+                Options =
+                {
+                    ScriptSchema = true,
+                    ScriptData = true,
+                    TargetServerVersion = SqlServerVersion.Version110,
+                    Default = true,
+                    Indexes = true,
+                    ClusteredIndexes = true,
+                    FullTextIndexes = true,
+                    NonClusteredIndexes = true,
+                    DriAll = true,
+                    IncludeDatabaseContext = false,
+                    NoFileGroup = true,
+                    NoTablePartitioningSchemes = true,
+                    NoIndexPartitioningSchemes = true
+                }
+            };
             var num = 1;
             scripter1.PrefetchObjects = num != 0;
             var scripter2 = scripter1;

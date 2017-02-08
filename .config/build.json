@@ -32,10 +32,19 @@
       "FilesToCopyToDst": [ "" ],
       "BuildFileName": "",
       "IsMergeable": true
+    },
+    {
+      "Name": "RunScript",
+      "Path": "\\src\\RunScript\\RunScript.csproj",
+      "ProjectName": "RunScript",
+      "OutputPathDirSufix": "RunScript",
+      "OutputName": "$productName-$VersionSemString",
+      "FilesToCopyToDst": [ "" ],
+      "BuildFileName": "",
+      "IsMergeable": true
     }
   ],
-  "PublishZipPathDirAbsolute": "C:\\Work\\AntyPiracy\\site-analyzer\\build-output\\ready\\zip",
+
   "SrcDir": "\\src",
   "PackagesDir": "\\src\\packages"
-
 }

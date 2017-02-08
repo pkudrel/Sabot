@@ -21,12 +21,15 @@ param(
 		$buildTmpDir = (Join-Path $buildPath "tmp"),
 		$projects = ([PSCustomObject]$conf.Projects),
 		$buildDir = "build",
+		$margeDir = "marge",
 		$readyDir =  (Join-Path $buildPath "ready"),
 		$srcDir = (Join-Path  $repoPath $conf.SrcDir),
 		$packagesDir = (Join-Path  $repoPath $conf.PackagesDir),
 		$toolsDir = (Join-Path $scriptsPath "tools"),
+		$nugetDir = (Join-Path $toolsDir "nuget"),
 		$nuget = (Join-Path $toolsDir "nuget\nuget.exe"),
 		$libz = (Join-Path $toolsDir "LibZ.Tool\tools\libz.exe"),
+		$7zip = (Join-Path $toolsDir "7-Zip.CommandLine\tools\7za.exe"),
 
 		$gitversion = (Join-Path $repoPath $conf.Gitversion),
 		$gitBranch,
@@ -116,6 +119,43 @@ task Build {
 }
 
 
+# Synopsis: Build the project.
+task Marge {
+	
+	Write-Host "*** Marge*** $projects"
+
+	$out = $buildTmpDir
+	$srcWorkDir = $srcDir 
+
+	
+
+	try {
+	   Push-Location
+		foreach ($p in $projects) {
+			Write-Host "Marge; Project: $($p.Name)"
+			# Out build Dir
+			$out = Join-Path (Join-Path $buildTmpDir $p.OutputPathDirSufix) $buildDir;
+			$marge = Join-Path (Join-Path $buildTmpDir $p.OutputPathDirSufix) $margeDir;
+			CreateDir $marge
+			Copy-Item "$out\*" -destination $marge
+			Push-Location $marge
+			Write-Host "Marge; Dir dir: $marge"
+			$exe = @(Get-ChildItem -Path $marge\* -Include @('*.exe')) | select -last 1
+			exec { & $libz inject-dll --assembly $exe --include *.dll --move     }
+			Pop-Location	 
+		}
+	}
+	catch {
+		
+		throw $_.Exception
+		exit 1
+	}
+	finally {
+		Pop-Location	
+	}
+	
+}
+
 
 
 task CopyToPublishRepo {
@@ -169,43 +209,23 @@ task CopyToPublishRepo {
 		 }
 	}
 
-
-
-}
-
-function DownloadNugetIfNotExists ($nuget, $packageName, $dstDirectory, $checkFile) {
-	$msg = "Package name: '$packageName'; Dst dir: '$dstDirectory'; Check file: '$checkFile'"
-	If (-not (Test-Path  $checkFile)){
-		Write-Host "$msg ; Check file not exists - processing"
-		& $nuget install $packageName -excludeversion -outputdirectory $dstDirectory
-	} else {
-		Write-Host "$msg ; Check file exists - exiting"
-	}
 }
 
 
 task CheckTools {
 	Write-Host "Check tools: Nuget"
-	DownloadIfNotExists "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" $nuget 
+	DownloadFileIfNotExists "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" $nugetDir $nuget 
 	Write-Host "Check tools: LibZ"
 	DownloadNugetIfNotExists $nuget "LibZ.Tool" $toolsDir $libz 
+	Write-Host "Check tools: 7-Zip"
+	DownloadNugetIfNotExists $nuget "7-Zip.CommandLine" $toolsDir $7zip
 }
 
-function DownloadIfNotExists($src , $dst){
-
-	If (-not (Test-Path $dst)){
-		$dir = [System.IO.Path]::GetDirectoryName($dst)
-		If (-not (Test-Path $dir)){
-			New-Item -ItemType directory -Path $dir
-		}
-	 	Invoke-WebRequest $src -OutFile $dst
-	}
-}
 
 
 # Synopsis: Build and clean.
 
 
 
-task Pre CheckTools, Update-TeamCity, Clean, RestorePackage, Build
+task Pre CheckTools, Update-TeamCity, Clean, RestorePackage, Build, Marge
 task . Pre

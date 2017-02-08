@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+
+using System;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -15,7 +17,7 @@ namespace Restore
             {
                 Console.WriteLine("Missing arguments:");
                 Console.WriteLine(
-                    "restorescript \"server=.;database=test_db;user=sa;password=password\" \"c:\\temp\\script.sql\"");
+                    "restore \"server=.;database=test_db;user=sa;password=password\" \"c:\\temp\\script.sql\"");
                 Environment.Exit(1);
             }
             Console.WriteLine("Connecting to database");
